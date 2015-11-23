@@ -1,0 +1,188 @@
+  <!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+	<title>Phaser test</title>
+	<script src="bower_components/phaser/build/phaser.js"></script>
+    <script src="boot.js"></script>
+		<script src="preload.js"></script>
+		<script src="gametitle.js"></script>
+		<script src="thegame.js"></script>
+		<script src="gameover.js"></script>	
+    <script src="settings.js"></script>
+    <script src="leveltwo.js"></script>
+    <script src="level3.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+   </head>
+   <body>
+   <script>
+   
+    (function() {
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game'//, {
+      //preload:preload, create:create, update:update,
+    /*}*/); 
+        game.state.add("Boot",boot);
+				game.state.add("Preload",preload);
+				game.state.add("GameTitle",gameTitle);
+				game.state.add("TheGame",theGame);
+				game.state.add("Settings", settings);
+        game.state.add("Leveltwo", leveltwo);
+        game.state.add("Level3", level3);
+				game.state.start("Boot");
+      })(); 
+     
+    /*function preload() {
+      game.load.image('sky', 'assets/cloudbackground.png');
+      game.load.image('ground', 'assets/platform.png');
+      game.load.image('ledge1', 'assets/ledge1.png');
+      game.load.image('ledge2', 'assets/ledge2.png');
+      game.load.image('star', 'assets/star.png');
+      game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+      game.load.image('button', 'assets/button.png');
+    }
+    
+    var platforms;
+    var player;
+    var stars;
+    var score = 0;
+    var scoreText;
+    var background;
+    var started_game = false;
+    var dzone = new Phaser.Rectangle(0, 100, 800, 600);
+    var gameOver;
+    var emitter1;
+    var emitter2;
+    
+    
+      function create() {
+      game.physics.startSystem(Phaser.Physics.ARCADE.BOTTOM_TOP);
+      background = game.add.tileSprite(0, 0, 800, 5000, 'sky');
+      game.world.setBounds(0, 0, 800, 5000);
+      platforms = game.add.group();
+      platforms.enableBody = true;
+      
+      game.add.text(400, 100, 'Stiga tolkova');
+      
+      var ground = platforms.create(0, game.world.height - 64, 'ground');
+      ground.scale.setTo(2, 2);
+      ground.body.immovable = true;
+      for (var i = 0; i < game.world.height; i += 256) {
+        var randomX = 0;
+        do {
+          randomX = game.world.randomX;
+        } while (randomX > game.world.width * 0.8);
+        if (Math.random() > 0.5) {
+        var ledge = platforms.create(randomX, i, 'ledge1');
+        }
+        else var ledge = platforms.create(randomX, i, 'ledge2');
+        ledge.body.immovable = true;
+        game.world.wrap(ledge);
+      }
+      
+      player = game.add.sprite(32, game.world.height - 150, 'dude');
+      game.physics.arcade.enable(player);
+      player.body.bounce.y = 0;
+      player.body.gravity.y = 3000;
+      player.body.collideWorldBounds = true;
+      game.camera.focusOn(player);
+      game.camera.follow(player);
+      game.camera.deadzone = dzone;
+      
+      
+      player.animations.add('left', [0, 1, 2, 3], 10, true);
+      player.animations.add('right', [5, 6, 7, 8], 10, true);
+      
+      stars = game.add.group();
+      stars.enableBody = true;
+      
+      emitter = game.add.emitter(10, 10, 50);
+      emitter2 = game.add.emitter(799, 10, 50);
+      emitter.makeParticles('star');
+      emitter.minParticleSpeed.setTo(-300,-300);
+      emitter.minParticleSpeed.setTo(300, 300);
+  
+      emitter2.makeParticles('star');
+      emitter2.minParticleSpeed.setTo(300,300);
+      emitter2.minParticleSpeed.setTo(-300, -300);
+      
+      for (var i = 0; i < 12; i++) {
+          var star = stars.create(i* 70, 0, 'star');
+          star.body.gravity.y = 200;
+          star.body.bounce.y = 0 + Math.random() * 0.2;
+          star.body.velocity.y = 20;
+      }
+      
+      //star.body.collideWorldBounds = true;
+      
+      }
+      
+      function update() {
+        scoreText = game.add.text(0, 0, 'Score: ');
+        scoreText.fixedToCamera = true;
+        game.physics.arcade.collide(player, platforms, null, function(object1, object2) {
+          return object1.body.position.y < object2.body.position.y;
+        });
+        game.physics.arcade.collide(stars, platforms);
+        //game.physics.arcade.collide(stars, player);
+        //game.physics.arcade.overlap(player, stars, collectStar, null, this); // tva tuka da subira zvezdi
+        cursors = game.input.keyboard.createCursorKeys();
+        player.body.velocity.x = 0;
+        //player.body.velocity.y = 0;
+        
+        if (cursors.left.isDown) {
+          player.body.velocity.x = -550;
+          player.animations.play('left');
+        } 
+        else if(cursors.right.isDown) {
+          player.body.velocity.x = 550;
+          player.animations.play('right');
+        }
+        
+        /*if(cursors.up.isDown) {
+          player.body.velocity.y = -550;
+        }*/
+        /*else if(cursors.down.isDown) {
+          player.body.velocity.y = 550;
+        }
+        else {
+          player.animations.stop();
+          player.frame = 4; 
+        }
+        if(cursors.up.isDown && player.body.touching.down) {
+          player.body.velocity.y = -1500;
+          started_game = true;
+        }
+        
+        if (started_game && !player.inCamera) {
+          player.kill();
+          game.camera.unfollow(player);
+          game.camera.focusOnXY(100, 400);
+          gameOver = game.add.text(100, 400, 'Game over');
+          var pressme = game.add.button(100, 500, 'button', actionOnClick, this);
+        }
+        
+          if(player.body.position.y < player.previousPosition.y){
+          score += 10;
+          scoreText.text = 'Score: ' + score;
+        }
+        /*if (player.body.position.y >  ) {
+            game.camera.unfollow(player);
+        }
+        else if (game.camera.target === null) {
+            game.camera.follow(player);
+        }*/
+/* }  
+  
+      function actionOnClick() {
+      emitter2.start(false, 0, 0);
+      emitter.start(false, 0, 0); 
+      window.location.reload();
+      }*/
+      
+      </script>
+   </body>
+</html>
