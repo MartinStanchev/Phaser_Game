@@ -1,0 +1,8 @@
+date,account,category,amount,currency,description
+01/12/2014,credit_card,bills,100,BGN,some description 
+31/07/2015,debit_card,food and drink,2000,RUB,vodka money
+25/05/2015,cash,fuel,200,USD,stupid description
+25/05/2015,debit_card,bills,500,EUR,ala bala
+22/05/2015,cash,bills,3000,SRD,uga buga
+22/05/2015,cash,food and drink,300,SRD,banani qbulki
+14/10/2014,abcdf,tehnika,100,USD,chushkopek lol
